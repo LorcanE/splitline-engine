@@ -69,9 +69,13 @@ CF_DEFAULT_DIVISIONS = [int(x) for x in env("CF_DIVISIONS", "1,2").split(",") if
 REQUEST_DELAY_S = float(env("CF_REQUEST_DELAY", "0.25"))
 REQUEST_TIMEOUT_S = float(env("CF_TIMEOUT", "30"))
 MAX_RETRIES = int(env("CF_MAX_RETRIES", "5"))
+# A crawler should say who it is and give a route to reach a human. The public
+# repo is that route — issues are open and it is verifiable, unlike an email
+# address nobody checks. Override CF_USER_AGENT to add a real contact address.
 USER_AGENT = env(
     "CF_USER_AGENT",
-    "SplitlineResearchBot/1.0 (+https://splitline.beehiiv.com; contact splitlinehq@gmail.com)",
+    "SplitlineResearchBot/1.0 "
+    "(+https://github.com/LorcanE/splitline-engine)",
 )
 
 # Cap for cheap/dry runs. 0 = no cap.
@@ -86,7 +90,10 @@ MIN_EFFECT = float(env("MIN_EFFECT", "0.08"))  # normalised effect size floor
 
 # ------------------------------------------------------------- delivery ----
 BEEHIIV_API_KEY = env("BEEHIIV_API_KEY")
-BEEHIIV_PUB_ID = env("BEEHIIV_PUB_ID", "pub_385f736e-c99e-4e63-80ad-46fa8a31d552")
+# No default: the publication id must come from your beehiiv account
+# (Settings -> Publication). A wrong id fails in a confusing way, so an
+# empty value that fails loudly is better than a guess that looks right.
+BEEHIIV_PUB_ID = env("BEEHIIV_PUB_ID")
 # The create-post endpoint is Max/Enterprise only. Leave off until the plan
 # supports it; the pipeline delivers a paste-ready post either way.
 BEEHIIV_AUTOPOST = env_bool("BEEHIIV_AUTOPOST", False)

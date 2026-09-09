@@ -58,7 +58,7 @@ jobs:
       - name: Commit dataset and product
         run: |
           git config user.name  "splitline-bot"
-          git config user.email "splitlinehq@gmail.com"
+          git config user.email "splitline-bot@users.noreply.github.com"
           git add data
           if git diff --staged --quiet; then
             echo "nothing to commit"

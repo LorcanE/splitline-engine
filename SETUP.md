@@ -35,7 +35,7 @@ gh repo create splitline-engine --public --source=. --push
 |---|---|
 | `CF_YEAR` | `2026` |
 | `CF_DIVISIONS` | `1,2` |
-| `ASSET_BASE` | `https://raw.githubusercontent.com/YOURNAME/splitline-engine/main/posts` |
+| `ASSET_BASE` | `https://raw.githubusercontent.com/LorcanE/splitline-engine/main/posts` |
 
 ## 3. Set the secrets so the post reaches you — 5 min
 
@@ -45,10 +45,10 @@ gh repo create splitline-engine --public --source=. --push
 |---|---|
 | `SMTP_HOST` | `smtp.gmail.com` |
 | `SMTP_PORT` | `587` |
-| `SMTP_USER` | `splitlinehq@gmail.com` |
+| `SMTP_USER` | the Gmail address the post should be sent **from** |
 | `SMTP_PASS` | a Gmail **app password**, not your account password |
-| `NOTIFY_EMAIL` | `splitlinehq@gmail.com` |
-| `BEEHIIV_PUB_ID` | `pub_385f736e-c99e-4e63-80ad-46fa8a31d552` |
+| `NOTIFY_EMAIL` | the address the post should be sent **to** |
+| `BEEHIIV_PUB_ID` | from beehiiv → Settings → Publication (only needed for API auto-publish) |
 
 Gmail app password: Google Account → Security → 2-Step Verification → App
 passwords. Takes two minutes and avoids putting your real password anywhere.
@@ -72,16 +72,31 @@ beehiiv post and send. From then on it fires every Monday morning by itself.
 
 ## 5. List the product on Lemon Squeezy — 15 min
 
-The workbook is built and waiting in `dist/`, and republished as a GitHub
-release every month.
+Store: `splitlinehq.lemonsqueezy.com`.
 
-- **Name:** Splitline Open Benchmark Workbook 2026
-- **Price:** $39. It is a business tool for gym owners, not an athlete impulse
-  buy. Do not price it at $9 — you will get fewer sales, not more, because $9
-  signals a PDF.
-- **Delivery:** upload the `.xlsx` as the digital download. Lemon Squeezy
-  handles payment, VAT, invoicing and delivery. That is the passive part.
-- **Licence line:** one gym, one coaching staff.
+**Launch with the HYROX Pacing Plan, not the Open workbook.** HYROX races run
+most weekends from September; the Open is in February. Both products are
+finished — the Open workbook is simply out of season until January, and will
+be worth more then than it is now.
+
+- **Name:** Splitline HYROX Pacing Plan
+- **Price:** $19. A pre-race impulse buy for an athlete, not a business tool.
+- **Delivery:** upload the `.xlsx` as the digital download. Lemon Squeezy is
+  Merchant of Record, so it collects and remits VAT/GST worldwide for you.
+  That is the genuinely passive part.
+- **Licence line:** one athlete, or one coaching staff.
+
+Build the file with:
+
+```bash
+python scripts/build_pacing.py \
+    --men data/hyrox_beijing_men_raw.txt \
+    --women data/hyrox_beijing_women_raw.txt \
+    --race "2026 HYROX Beijing"
+```
+
+It lands in `dist/`, which is gitignored on purpose — the repo is public and
+the product is not.
 
 Then set the `SPLITLINE_PRODUCT_URL` repository **variable** to the checkout
 link. Every future post gets a buy button in the footer automatically. That is
@@ -90,9 +105,10 @@ analysis is real, the footer sells the workbook.
 
 ## 6. Put the sales page up — 10 min
 
-`site/index.html` is a complete, self-contained landing page. Drag the `site`
-folder onto Netlify, point the Lemon Squeezy checkout button at your product,
-and link it from the free tools you already have live.
+`site/hyrox.html` is the HYROX sales page (`site/index.html` is the Open one,
+for January). Drag the `site` folder onto Netlify, then replace
+`REPLACE_WITH_LEMONSQUEEZY_CHECKOUT_URL` in the page with your real checkout
+link, and link it from the free tools you already have live.
 
 ## 7. Optional: full auto-publish — 2 min
 
@@ -109,8 +125,8 @@ sends without a human, which is a decision worth making deliberately.
 | Schedule | Workflow | What happens |
 |---|---|---|
 | Mondays 07:00 Melbourne | Weekly post | Picks the next angle, analyses, writes, charts, emails you |
-| 1st of the month, 04:00 | Refresh dataset | Full re-crawl, rebuilds the product, cuts a release |
-| Every push | Self test | 51 checks, plus a live probe of the leaderboard API |
+| 1st of the month, 04:00 | Refresh dataset | Full re-crawl, rebuilds the product as a private workflow artifact |
+| Every push | Self test | 82 checks, plus a live probe of the leaderboard API |
 
 ## When something breaks
 
