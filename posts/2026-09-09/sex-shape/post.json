@@ -1,0 +1,23 @@
+{
+  "slug": "sex-shape",
+  "title": "Same finish time, completely different race",
+  "subtitle": "82 men and 81 women who finished between 85 and 95 minutes. Matching on finish time strips out speed and leaves only shape.",
+  "preview_text": "Comparing men's and women's HYROX times tells you nothing except that men are faster. The interesting question is what happens when you hold finish time fixed \u2014 take only the\u2026",
+  "date": "2026-09-09",
+  "n": 163,
+  "effect": 0.2267,
+  "stats": {
+    "n_men": 82,
+    "n_women": 81,
+    "women_best": "100m Sandbag Lunges",
+    "women_worst": "All eight runs",
+    "span_s": 136.0
+  },
+  "assets": [
+    "sex_shape.png"
+  ],
+  "asset_base": "https://raw.githubusercontent.com/LorcanE/splitline-engine/main/posts",
+  "asset_dir": "2026-09-09/sex-shape",
+  "dataset_note": "Method: computed from the published split tables of 844 finishers at 2026 HYROX Beijing. An athlete is included only if their sixteen splits plus roxzone reconstruct their published finish time to within 2%.",
+  "source": "the public HYROX race results at results.hyrox.com"
+}
