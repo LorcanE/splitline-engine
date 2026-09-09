@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Benchmark your gym's CrossFit Open results against the full public field of 233,072 athletes.">
+<style>body{margin:0}img{max-width:100%}</style>
+<title>Open Benchmark Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --paper:#F7F8FA;
+    --surface:#FFFFFF;
+    --ink:#12161C;
+    --muted:#66707D;
+    --rule:#D9DEE4;
+    --hair:#E7EAEF;
+    --blue:#1B4965;
+    --orange:#E4572E;
+    --wash:#EEF1F5;
+    --display:'Archivo',ui-sans-serif,system-ui,'Helvetica Neue',Arial,sans-serif;
+    --body:'Newsreader',Georgia,'Times New Roman',serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --measure:34rem;
+    --wide:54rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1216; --surface:#161B21; --ink:#E7EBEF; --muted:#8A95A2;
+      --rule:#2A323B; --hair:#212831; --blue:#6FA8C7; --orange:#F0764F;
+      --wash:#1B222A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1216; --surface:#161B21; --ink:#E7EBEF; --muted:#8A95A2;
+    --rule:#2A323B; --hair:#212831; --blue:#6FA8C7; --orange:#F0764F;
+    --wash:#1B222A;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--body); font-size:19px; line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:var(--wide); margin:0 auto; padding:0 28px 96px}
+  p{margin:0 0 1.05em; max-width:var(--measure)}
+  a{color:inherit}
+
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    margin:0;
+  }
+
+  /* ---- masthead ---- */
+  .masthead{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:20px; flex-wrap:wrap;
+    padding:26px 0 14px; border-bottom:2px solid var(--ink);
+  }
+  .wordmark{
+    font-family:var(--display); font-weight:800; font-size:19px;
+    letter-spacing:-.02em; margin:0;
+  }
+  .wordmark span{color:var(--orange)}
+
+  /* ---- hero ---- */
+  .hero{padding:56px 0 8px}
+  h1{
+    font-family:var(--display); font-weight:800;
+    font-size:clamp(2.4rem,6.2vw,4.1rem); line-height:1.03;
+    letter-spacing:-.032em; margin:14px 0 0; text-wrap:balance;
+    max-width:17ch;
+  }
+  h1 em{font-style:normal; color:var(--blue)}
+  .standfirst{
+    font-size:1.22rem; line-height:1.55; color:var(--muted);
+    max-width:38rem; margin:22px 0 0;
+  }
+
+  /* ---- the specimen ---- */
+  .specimen{margin:44px 0 0}
+  .specimen-frame{
+    background:var(--surface); border:1px solid var(--rule);
+    overflow-x:auto;
+  }
+  .specimen-bar{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 14px; border-bottom:1px solid var(--rule);
+    background:var(--wash);
+  }
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--rule)}
+  .specimen-bar .name{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    letter-spacing:.02em;
+  }
+  table{
+    width:100%; border-collapse:collapse;
+    font-family:var(--mono); font-size:13px;
+    font-variant-numeric:tabular-nums;
+  }
+  thead th{
+    text-align:left; padding:11px 13px; white-space:nowrap;
+    font-size:10.5px; font-weight:600; letter-spacing:.09em;
+    text-transform:uppercase; color:#fff; background:var(--blue);
+  }
+  tbody td{
+    padding:10px 13px; border-bottom:1px solid var(--hair);
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:right}
+  .derived{color:var(--blue); font-weight:600}
+  .flag{color:var(--orange); font-weight:600}
+  .note{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    margin:11px 0 0; letter-spacing:.01em; max-width:none;
+  }
+
+  /* ---- rhythm ---- */
+  section{padding:60px 0 0}
+  hr{border:0; border-top:1px solid var(--rule); margin:60px 0 0}
+  h2{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(1.5rem,3vw,2rem); line-height:1.16;
+    letter-spacing:-.022em; margin:12px 0 20px; text-wrap:balance;
+    max-width:28ch;
+  }
+  h3{
+    font-family:var(--display); font-weight:700; font-size:1.02rem;
+    letter-spacing:-.005em; margin:0 0 5px;
+  }
+
+  /* ---- what it computes ---- */
+  .cols{
+    display:grid; gap:34px 44px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    margin-top:8px;
+  }
+  @media (max-width:560px){ .cols{grid-template-columns:1fr} }
+  .col p{font-size:.94rem; line-height:1.55; color:var(--muted); margin:0}
+  .col .val{
+    font-family:var(--mono); font-size:12px; color:var(--blue);
+    font-weight:600; display:block; margin:9px 0 0;
+    padding-top:9px; border-top:1px solid var(--hair);
+  }
+
+  /* ---- contents ---- */
+  .contents{
+    margin:8px 0 0; max-width:var(--measure); border-top:1px solid var(--rule);
+  }
+  .row{
+    display:grid; grid-template-columns:2.2rem 1fr auto; gap:16px;
+    align-items:baseline; padding:13px 0; border-bottom:1px solid var(--hair);
+  }
+  .row .idx{
+    font-family:var(--mono); font-size:11px; color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .row .what{font-family:var(--display); font-weight:600; font-size:.98rem}
+  .row .desc{
+    font-size:.87rem; color:var(--muted); font-family:var(--body);
+    grid-column:2 / -1; margin-top:2px; line-height:1.45;
+  }
+  .row .tag{
+    font-family:var(--mono); font-size:10.5px; color:var(--muted);
+    letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+  }
+
+  /* ---- honest box ---- */
+  .honest{
+    border-left:3px solid var(--orange); padding:2px 0 2px 20px;
+    margin:26px 0 0; max-width:var(--measure);
+  }
+  .honest p:last-child{margin-bottom:0}
+
+  /* ---- two-up lists ---- */
+  .forwho{
+    display:grid; gap:30px 44px;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    margin-top:6px;
+  }
+  ul{margin:0; padding:0; list-style:none}
+  li{
+    font-size:.96rem; line-height:1.5; padding:9px 0 9px 22px;
+    border-bottom:1px solid var(--hair); position:relative; color:var(--ink);
+  }
+  li::before{
+    position:absolute; left:0; top:9px;
+    font-family:var(--mono); font-size:12px; font-weight:600;
+  }
+  .yes li::before{content:"+"; color:var(--blue)}
+  .no li::before{content:"–"; color:var(--muted)}
+  .no li{color:var(--muted)}
+
+  /* ---- price ---- */
+  .price-block{
+    border:1px solid var(--rule); background:var(--surface);
+    padding:34px; margin-top:10px; max-width:var(--measure);
+  }
+  .amount{
+    font-family:var(--display); font-weight:800;
+    font-size:3.1rem; letter-spacing:-.035em; line-height:1; margin:6px 0 0;
+  }
+  .amount .cur{font-size:1.5rem; vertical-align:.55em; margin-right:2px;
+    color:var(--muted); font-weight:600}
+  .amount .per{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); font-weight:500;
+    display:block; margin-top:11px;
+  }
+  .buy{
+    display:inline-block; margin:24px 0 0; padding:15px 30px;
+    background:var(--orange); color:#fff; text-decoration:none;
+    font-family:var(--display); font-weight:700; font-size:1rem;
+    letter-spacing:-.005em; border:1px solid var(--orange);
+    transition:background .14s ease, transform .14s ease;
+  }
+  .buy:hover{background:#c9481f; border-color:#c9481f}
+  .buy:active{transform:translateY(1px)}
+  .buy:focus-visible{outline:3px solid var(--blue); outline-offset:3px}
+  .terms{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    margin:16px 0 0; line-height:1.65; max-width:none;
+  }
+
+  /* ---- faq ---- */
+  .faq{max-width:var(--measure); margin-top:4px}
+  .q{border-bottom:1px solid var(--hair); padding:18px 0}
+  .q h3{margin-bottom:6px}
+  .q p{font-size:.94rem; color:var(--muted); margin:0; line-height:1.55}
+
+  footer{
+    margin-top:60px; padding-top:22px; border-top:2px solid var(--ink);
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    letter-spacing:.02em;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important; animation:none !important}
+  }
+  @media (max-width:640px){
+    body{font-size:18px}
+    .page{padding:0 20px 72px}
+    .price-block{padding:26px}
+  }
+</style>
+
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark">Split<span>line</span></p>
+    <p class="eyebrow">Hybrid fitness, measured honestly</p>
+  </header>
+
+  <div class="hero">
+    <p class="eyebrow">2026 Open · Benchmark Workbook</p>
+    <h1>Your athlete placed 6,000th. <em>Was that good?</em></h1>
+    <p class="standfirst">
+      The leaderboard cannot tell you. It ranks a 44-year-old against
+      23-year-olds and calls it a result. This workbook takes the whole public
+      field — 233,072 athletes — and tells you what each placing was actually
+      worth.
+    </p>
+  </div>
+
+  <div class="specimen">
+    <div class="specimen-frame">
+      <div class="specimen-bar">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="name">Splitline Open Benchmark Workbook 2026 — My athletes</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Athlete</th>
+            <th scope="col">Division</th>
+            <th scope="col">Age</th>
+            <th scope="col">Place</th>
+            <th scope="col">Field</th>
+            <th scope="col">Percentile</th>
+            <th scope="col">Age-adjusted</th>
+            <th scope="col">Weakest</th>
+            <th scope="col">To gain</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aoife M.</td><td>Women</td><td class="num">27</td>
+            <td class="num">1,200</td>
+            <td class="num derived">105,959</td>
+            <td class="num derived">1.1%</td>
+            <td class="num derived">+46.4%</td>
+            <td class="flag">WK3</td>
+            <td class="num">600</td>
+          </tr>
+          <tr>
+            <td>Dara K.</td><td>Men</td><td class="num">44</td>
+            <td class="num">6,000</td>
+            <td class="num derived">127,113</td>
+            <td class="num derived">4.7%</td>
+            <td class="num derived">+55.4%</td>
+            <td class="flag">WK3</td>
+            <td class="num">2,700</td>
+          </tr>
+          <tr>
+            <td>Niamh B.</td><td>Women</td><td class="num">52</td>
+            <td class="num">48,000</td>
+            <td class="num derived">105,959</td>
+            <td class="num derived">45.3%</td>
+            <td class="num derived">+21.8%</td>
+            <td class="flag">WK2</td>
+            <td class="num">1,100</td>
+          </tr>
+          <tr>
+            <td>Cillian R.</td><td>Men</td><td class="num">31</td>
+            <td class="num">45,000</td>
+            <td class="num derived">127,113</td>
+            <td class="num derived">35.4%</td>
+            <td class="num derived">+11.9%</td>
+            <td class="flag">WK1</td>
+            <td class="num">180</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Example rows. You type the four white columns; everything in blue is a
+      live formula reading the benchmark tables underneath.
+    </p>
+  </div>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">The problem</p>
+    <h2>A percentile is not a judgement. It is the start of one.</h2>
+    <p>
+      Every February you have the same conversation eight times. An athlete
+      shows you a number, you say something encouraging, and neither of you
+      knows whether the number was good. The leaderboard sorts 233,072 people
+      into one column and stops there.
+    </p>
+    <p>
+      What you actually need is three things it will not give you: how they did
+      against people their own age, which of the three workouts is dragging
+      their ranking down, and how many places fixing it is worth. All three are
+      computable from the public field. Nobody computes them, because it takes
+      a full crawl of 4,663 leaderboard pages to build the tables.
+    </p>
+    <p>That crawl is what you are buying.</p>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">What it computes</p>
+    <h2>Four columns you cannot get anywhere else</h2>
+    <div class="cols">
+      <div class="col">
+        <h3>Percentile</h3>
+        <p>
+          Place against finishers only — athletes with a valid score on every
+          workout. Counting the people who quit flatters everyone by about
+          fifteen points.
+        </p>
+        <span class="val">1,200 of 105,959 → 1.1%</span>
+      </div>
+      <div class="col">
+        <h3>Age-adjusted</h3>
+        <p>
+          How far ahead of the median athlete in their own five-year age band
+          they finished. This is the number worth showing a 44-year-old.
+        </p>
+        <span class="val">+55.4% vs the 40–44 median</span>
+      </div>
+      <div class="col">
+        <h3>Weakest workout</h3>
+        <p>
+          Named, not guessed. The workout where their placing is furthest
+          behind their own standard — which is where their ranking is being
+          set.
+        </p>
+        <span class="val">WK3</span>
+      </div>
+      <div class="col">
+        <h3>Places to gain</h3>
+        <p>
+          What closing that one gap is worth, in places. It turns a training
+          argument into arithmetic, and it is nearly always the cheapest
+          improvement available.
+        </p>
+        <span class="val">2,700 places</span>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">What is in the file</p>
+    <h2>Six sheets. One of them you type in.</h2>
+    <div class="contents">
+      <div class="row">
+        <span class="idx">01</span>
+        <span class="what">Start here</span>
+        <span class="tag">Read once</span>
+        <span class="desc">Three steps, no spreadsheet skill assumed.</span>
+      </div>
+      <div class="row">
+        <span class="idx">02</span>
+        <span class="what">My athletes</span>
+        <span class="tag">You type here</span>
+        <span class="desc">Sixty rows, pre-wired. Name, division, age, places in — everything else out.</span>
+      </div>
+      <div class="row">
+        <span class="idx">03</span>
+        <span class="what">Divisions</span>
+        <span class="tag">Lookup</span>
+        <span class="desc">Finisher counts per division, the denominator behind every percentile.</span>
+      </div>
+      <div class="row">
+        <span class="idx">04</span>
+        <span class="what">Age curves</span>
+        <span class="tag">Lookup</span>
+        <span class="desc">Median percentile for every division and five-year age band, with the sample size beside it.</span>
+      </div>
+      <div class="row">
+        <span class="idx">05</span>
+        <span class="what">Cutlines</span>
+        <span class="tag">Reference</span>
+        <span class="desc">The score and place at the 1st, 5th, 10th, 25th, 50th and 75th percentile, workout by workout.</span>
+      </div>
+      <div class="row">
+        <span class="idx">06</span>
+        <span class="what">Method</span>
+        <span class="tag">Reference</span>
+        <span class="desc">Every definition stated plainly, including what the data cannot support.</span>
+      </div>
+    </div>
+    <p class="note">
+      .xlsx · opens in Excel, Numbers, Google Sheets and LibreOffice · live
+      formulas, not pasted values · no macros, no add-ins, works offline
+    </p>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Why you can trust the numbers</p>
+    <h2>The limits are printed inside the file</h2>
+    <p>
+      Everything comes from the public CrossFit Games Open leaderboard, crawled
+      in full. No estimates, no modelled fill-ins, no proprietary index that
+      cannot be checked.
+    </p>
+    <div class="honest">
+      <p>
+        Height and weight are self-reported and often left blank, so anything
+        involving body composition covers a subset of the field and says so.
+        Age bands need at least thirty finishers before they appear at all.
+        Cutline scores are the neighbourhood of a threshold, not an exact
+        boundary, because scores are discrete and percentiles are not.
+      </p>
+      <p>
+        If you find a figure you think is wrong, send it over. Corrections get
+        published, not quietly patched.
+      </p>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Fit</p>
+    <h2>Worth it, and not worth it</h2>
+    <div class="forwho">
+      <div>
+        <p class="eyebrow">Buy it if</p>
+        <ul class="yes">
+          <li>You coach a group through the Open and debrief them afterwards</li>
+          <li>You have masters athletes whose raw percentile undersells them</li>
+          <li>You program the off-season around individual weaknesses</li>
+          <li>You want one honest number for the gym noticeboard</li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Skip it if</p>
+        <ul class="no">
+          <li>You want a training programme — this measures, it does not prescribe</li>
+          <li>You only care about your own score and already know it</li>
+          <li>You want live in-season updates during the three Open weeks</li>
+          <li>You will not open a spreadsheet</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Price</p>
+    <h2>One gym, one coaching staff</h2>
+    <div class="price-block">
+      <p class="eyebrow">Splitline Open Benchmark Workbook 2026</p>
+      <p class="amount"><span class="cur">$</span>39<span class="per">one payment · instant download</span></p>
+      <a class="buy" href="REPLACE_WITH_LEMONSQUEEZY_CHECKOUT_URL">Get the workbook</a>
+      <p class="terms">
+        Share the outputs with your athletes freely. Please do not redistribute
+        the file itself.<br>
+        Rebuilt monthly from a fresh crawl — you get the current version, and
+        every rebuild for the 2026 season.
+      </p>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Questions</p>
+    <h2>Before you buy</h2>
+    <div class="faq">
+      <div class="q">
+        <h3>Do I need my athletes' full leaderboard data?</h3>
+        <p>
+          No. You need four things per athlete: division, age, overall place,
+          and their place on each workout. All four are on their public
+          leaderboard profile.
+        </p>
+      </div>
+      <div class="q">
+        <h3>Does it work in Google Sheets?</h3>
+        <p>
+          Yes. The lookups deliberately avoid array formulas, so they behave the
+          same in Excel, Numbers, Google Sheets and LibreOffice. No macros to
+          enable and nothing to install.
+        </p>
+      </div>
+      <div class="q">
+        <h3>Why not just use the leaderboard filters?</h3>
+        <p>
+          The leaderboard filters to a division. It will not tell you the median
+          percentile of a 44-year-old, because that requires the whole field at
+          once. That is the table this file contains.
+        </p>
+      </div>
+      <div class="q">
+        <h3>What happens next season?</h3>
+        <p>
+          A 2027 edition, rebuilt from the 2027 field. This purchase covers the
+          2026 season and every rebuild within it.
+        </p>
+      </div>
+      <div class="q">
+        <h3>Who makes this?</h3>
+        <p>
+          Splitline — a newsletter that analyses hybrid fitness data and shows
+          its working. The same crawl behind this workbook is what the weekly
+          analysis runs on.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Splitline · splitline.beehiiv.com</span>
+    <span>Source: public CrossFit Games Open leaderboard</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

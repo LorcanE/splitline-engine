@@ -1,0 +1,80 @@
+name: Refresh dataset and rebuild product
+
+# The full crawl is expensive, so it runs monthly rather than weekly. The
+# weekly post reads whatever this last left behind.
+on:
+  schedule:
+    - cron: "0 18 1 * *"   # 1st of the month, 04:00 Melbourne
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: "Cap pages per division (0 = full crawl)"
+        required: false
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: splitline-ingest
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Report field size before crawling
+        env:
+          CF_YEAR: ${{ vars.CF_YEAR || '2026' }}
+          CF_DIVISIONS: ${{ vars.CF_DIVISIONS || '1,2' }}
+        run: python scripts/ingest.py --probe
+
+      - name: Full ingest
+        env:
+          CF_YEAR: ${{ vars.CF_YEAR || '2026' }}
+          CF_DIVISIONS: ${{ vars.CF_DIVISIONS || '1,2' }}
+          CF_REQUEST_DELAY: ${{ vars.CF_REQUEST_DELAY || '0.25' }}
+        run: |
+          python scripts/ingest.py --max-pages ${{ github.event.inputs.max_pages || '0' }}
+          # A real ingest invalidates any synthetic marker left by a fixture run.
+          rm -f data/*.SYNTHETIC
+
+      - name: Rebuild the product
+        env:
+          CF_YEAR: ${{ vars.CF_YEAR || '2026' }}
+          SPLITLINE_PRODUCT_URL: ${{ vars.SPLITLINE_PRODUCT_URL }}
+        run: python scripts/build_product.py
+
+      - name: Commit dataset and product
+        run: |
+          git config user.name  "splitline-bot"
+          git config user.email "splitlinehq@gmail.com"
+          git add data
+          if git diff --staged --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "data: refresh $(date -u +%Y-%m)"
+            git push
+          fi
+
+      # The rebuilt product is uploaded as a workflow artifact, NOT a public
+      # release. Releases on a public repo are downloadable by anyone, which
+      # would hand the paid product away. Artifacts are visible only to people
+      # with repo access, so you download it from the run and upload it to
+      # Lemon Squeezy yourself.
+      - name: Upload the rebuilt product (private to the repo)
+        uses: actions/upload-artifact@v4
+        with:
+          name: splitline-product-${{ github.run_number }}
+          path: dist/*.xlsx
+          retention-days: 90

@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Type your HYROX target time, get the split you need at all 17 segments. Built from real race split data.">
+<title>HYROX Pacing Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --paper:#F7F8FA;
+    --surface:#FFFFFF;
+    --ink:#12161C;
+    --muted:#66707D;
+    --rule:#D9DEE4;
+    --hair:#E7EAEF;
+    --blue:#1B4965;
+    --orange:#E4572E;
+    --wash:#EEF1F5;
+    --display:'Archivo',ui-sans-serif,system-ui,'Helvetica Neue',Arial,sans-serif;
+    --body:'Newsreader',Georgia,'Times New Roman',serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --measure:34rem;
+    --wide:54rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1216; --surface:#161B21; --ink:#E7EBEF; --muted:#8A95A2;
+      --rule:#2A323B; --hair:#212831; --blue:#6FA8C7; --orange:#F0764F;
+      --wash:#1B222A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1216; --surface:#161B21; --ink:#E7EBEF; --muted:#8A95A2;
+    --rule:#2A323B; --hair:#212831; --blue:#6FA8C7; --orange:#F0764F;
+    --wash:#1B222A;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--body); font-size:19px; line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:var(--wide); margin:0 auto; padding:0 28px 96px}
+  p{margin:0 0 1.05em; max-width:var(--measure)}
+  a{color:inherit}
+
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    margin:0;
+  }
+
+  /* ---- masthead ---- */
+  .masthead{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:20px; flex-wrap:wrap;
+    padding:26px 0 14px; border-bottom:2px solid var(--ink);
+  }
+  .wordmark{
+    font-family:var(--display); font-weight:800; font-size:19px;
+    letter-spacing:-.02em; margin:0;
+  }
+  .wordmark span{color:var(--orange)}
+
+  /* ---- hero ---- */
+  .hero{padding:56px 0 8px}
+  h1{
+    font-family:var(--display); font-weight:800;
+    font-size:clamp(2.4rem,6.2vw,4.1rem); line-height:1.03;
+    letter-spacing:-.032em; margin:14px 0 0; text-wrap:balance;
+    max-width:17ch;
+  }
+  h1 em{font-style:normal; color:var(--blue)}
+  .standfirst{
+    font-size:1.22rem; line-height:1.55; color:var(--muted);
+    max-width:38rem; margin:22px 0 0;
+  }
+
+  /* ---- the specimen ---- */
+  .specimen{margin:44px 0 0}
+  .specimen-frame{
+    background:var(--surface); border:1px solid var(--rule);
+    overflow-x:auto;
+  }
+  .specimen-bar{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 14px; border-bottom:1px solid var(--rule);
+    background:var(--wash);
+  }
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--rule)}
+  .specimen-bar .name{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    letter-spacing:.02em;
+  }
+  table{
+    width:100%; border-collapse:collapse;
+    font-family:var(--mono); font-size:13px;
+    font-variant-numeric:tabular-nums;
+  }
+  thead th{
+    text-align:left; padding:11px 13px; white-space:nowrap;
+    font-size:10.5px; font-weight:600; letter-spacing:.09em;
+    text-transform:uppercase; color:#fff; background:var(--blue);
+  }
+  tbody td{
+    padding:10px 13px; border-bottom:1px solid var(--hair);
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:right}
+  .derived{color:var(--blue); font-weight:600}
+  .flag{color:var(--orange); font-weight:600}
+  .note{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    margin:11px 0 0; letter-spacing:.01em; max-width:none;
+  }
+
+  /* ---- rhythm ---- */
+  section{padding:60px 0 0}
+  hr{border:0; border-top:1px solid var(--rule); margin:60px 0 0}
+  h2{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(1.5rem,3vw,2rem); line-height:1.16;
+    letter-spacing:-.022em; margin:12px 0 20px; text-wrap:balance;
+    max-width:28ch;
+  }
+  h3{
+    font-family:var(--display); font-weight:700; font-size:1.02rem;
+    letter-spacing:-.005em; margin:0 0 5px;
+  }
+
+  /* ---- what it computes ---- */
+  .cols{
+    display:grid; gap:34px 44px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    margin-top:8px;
+  }
+  @media (max-width:560px){ .cols{grid-template-columns:1fr} }
+  .col p{font-size:.94rem; line-height:1.55; color:var(--muted); margin:0}
+  .col .val{
+    font-family:var(--mono); font-size:12px; color:var(--blue);
+    font-weight:600; display:block; margin:9px 0 0;
+    padding-top:9px; border-top:1px solid var(--hair);
+  }
+
+  /* ---- contents ---- */
+  .contents{
+    margin:8px 0 0; max-width:var(--measure); border-top:1px solid var(--rule);
+  }
+  .row{
+    display:grid; grid-template-columns:2.2rem 1fr auto; gap:16px;
+    align-items:baseline; padding:13px 0; border-bottom:1px solid var(--hair);
+  }
+  .row .idx{
+    font-family:var(--mono); font-size:11px; color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .row .what{font-family:var(--display); font-weight:600; font-size:.98rem}
+  .row .desc{
+    font-size:.87rem; color:var(--muted); font-family:var(--body);
+    grid-column:2 / -1; margin-top:2px; line-height:1.45;
+  }
+  .row .tag{
+    font-family:var(--mono); font-size:10.5px; color:var(--muted);
+    letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;
+  }
+
+  /* ---- honest box ---- */
+  .honest{
+    border-left:3px solid var(--orange); padding:2px 0 2px 20px;
+    margin:26px 0 0; max-width:var(--measure);
+  }
+  .honest p:last-child{margin-bottom:0}
+
+  /* ---- two-up lists ---- */
+  .forwho{
+    display:grid; gap:30px 44px;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    margin-top:6px;
+  }
+  ul{margin:0; padding:0; list-style:none}
+  li{
+    font-size:.96rem; line-height:1.5; padding:9px 0 9px 22px;
+    border-bottom:1px solid var(--hair); position:relative; color:var(--ink);
+  }
+  li::before{
+    position:absolute; left:0; top:9px;
+    font-family:var(--mono); font-size:12px; font-weight:600;
+  }
+  .yes li::before{content:"+"; color:var(--blue)}
+  .no li::before{content:"–"; color:var(--muted)}
+  .no li{color:var(--muted)}
+
+  /* ---- price ---- */
+  .price-block{
+    border:1px solid var(--rule); background:var(--surface);
+    padding:34px; margin-top:10px; max-width:var(--measure);
+  }
+  .amount{
+    font-family:var(--display); font-weight:800;
+    font-size:3.1rem; letter-spacing:-.035em; line-height:1; margin:6px 0 0;
+  }
+  .amount .cur{font-size:1.5rem; vertical-align:.55em; margin-right:2px;
+    color:var(--muted); font-weight:600}
+  .amount .per{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); font-weight:500;
+    display:block; margin-top:11px;
+  }
+  .buy{
+    display:inline-block; margin:24px 0 0; padding:15px 30px;
+    background:var(--orange); color:#fff; text-decoration:none;
+    font-family:var(--display); font-weight:700; font-size:1rem;
+    letter-spacing:-.005em; border:1px solid var(--orange);
+    transition:background .14s ease, transform .14s ease;
+  }
+  .buy:hover{background:#c9481f; border-color:#c9481f}
+  .buy:active{transform:translateY(1px)}
+  .buy:focus-visible{outline:3px solid var(--blue); outline-offset:3px}
+  .terms{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    margin:16px 0 0; line-height:1.65; max-width:none;
+  }
+
+  /* ---- faq ---- */
+  .faq{max-width:var(--measure); margin-top:4px}
+  .q{border-bottom:1px solid var(--hair); padding:18px 0}
+  .q h3{margin-bottom:6px}
+  .q p{font-size:.94rem; color:var(--muted); margin:0; line-height:1.55}
+
+  footer{
+    margin-top:60px; padding-top:22px; border-top:2px solid var(--ink);
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    letter-spacing:.02em;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important; animation:none !important}
+  }
+  @media (max-width:640px){
+    body{font-size:18px}
+    .page{padding:0 20px 72px}
+    .price-block{padding:26px}
+  }
+
+  td.alt { color: var(--orange); font-weight: 600; }
+  .statrow {
+    display:grid; gap:26px 34px; margin:30px 0 0;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  }
+  .stat .fig {
+    font-family:var(--display); font-weight:800; font-size:2.2rem;
+    letter-spacing:-.03em; line-height:1; color:var(--blue);
+  }
+  .stat .cap {
+    font-size:.86rem; line-height:1.45; color:var(--muted);
+    margin:8px 0 0; font-family:var(--body);
+  }
+</style>
+
+</head>
+<body style="margin:0">
+<div class="page">
+
+  <header class="masthead">
+    <p class="wordmark">Split<span>line</span></p>
+    <p class="eyebrow">Hybrid fitness, measured honestly</p>
+  </header>
+
+  <div class="hero">
+    <p class="eyebrow">HYROX · Race Pacing Plan</p>
+    <h1>You know your target time. <em>Do you know your splits?</em></h1>
+    <p class="standfirst">
+      Type the finish time you are chasing. Get the split you need at every one
+      of the seventeen segments, and the clock you should see leaving each one —
+      built from the actual split tables of real finishers, not from dividing
+      your goal by eight.
+    </p>
+  </div>
+
+  <div class="specimen">
+    <div class="specimen-frame">
+      <div class="specimen-bar">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="name">Splitline HYROX Pacing Plan — target 90:00</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Segment</th>
+            <th scope="col">Men</th>
+            <th scope="col">Clock</th>
+            <th scope="col">Women</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Run 1</td><td class="num">5:04</td><td class="num derived">5:04</td><td class="num alt">5:23</td></tr>
+          <tr><td>1000m SkiErg</td><td class="num">4:45</td><td class="num derived">9:49</td><td class="num alt">5:24</td></tr>
+          <tr><td>Run 2</td><td class="num">4:37</td><td class="num derived">14:26</td><td class="num alt">4:50</td></tr>
+          <tr><td>50m Sled Push</td><td class="num">3:08</td><td class="num derived">17:34</td><td class="num alt">2:50</td></tr>
+          <tr><td>Run 3</td><td class="num">4:57</td><td class="num derived">22:31</td><td class="num alt">5:01</td></tr>
+          <tr><td>50m Sled Pull</td><td class="num">5:11</td><td class="num derived">27:42</td><td class="num alt">5:32</td></tr>
+          <tr><td>Run 4</td><td class="num">4:53</td><td class="num derived">32:35</td><td class="num alt">4:59</td></tr>
+          <tr><td>80m Burpee Broad Jump</td><td class="num">5:25</td><td class="num derived">38:00</td><td class="num alt">5:37</td></tr>
+          <tr><td>Run 5</td><td class="num">5:06</td><td class="num derived">43:06</td><td class="num alt">5:15</td></tr>
+          <tr><td>1000m Row</td><td class="num">5:01</td><td class="num derived">48:07</td><td class="num alt">5:30</td></tr>
+          <tr><td>Run 6</td><td class="num">5:00</td><td class="num derived">53:07</td><td class="num alt">5:09</td></tr>
+          <tr><td>200m Farmers Carry</td><td class="num">2:29</td><td class="num derived">55:36</td><td class="num alt">2:22</td></tr>
+          <tr><td>Run 7</td><td class="num">5:04</td><td class="num derived">60:40</td><td class="num alt">5:07</td></tr>
+          <tr><td>100m Sandbag Lunges</td><td class="num">5:39</td><td class="num derived">66:19</td><td class="num alt">4:46</td></tr>
+          <tr><td>Run 8</td><td class="num">6:00</td><td class="num derived">72:19</td><td class="num alt">5:46</td></tr>
+          <tr><td>Wall Balls</td><td class="num">7:11</td><td class="num derived">79:30</td><td class="num alt">6:35</td></tr>
+          <tr><td>Roxzone (transitions)</td><td class="num">10:30</td><td class="num derived">90:00</td><td class="num alt">9:54</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      The real output for a 90-minute target. Change the number, the whole plan
+      changes. Change the division and it changes again — because it should.
+    </p>
+  </div>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">The problem</p>
+    <h2>Nobody paces a HYROX by dividing by eight</h2>
+    <p>
+      And yet that is what most race plans amount to. A HYROX is not eight
+      equal efforts — it is eight runs, eight stations and a transition zone
+      that each behave differently, and the shape of the race changes with the
+      time you are chasing.
+    </p>
+    <p>
+      A 65-minute athlete and a 95-minute athlete do not run the same race
+      slower and faster. They run different races. The wall balls take one of
+      them under five minutes and the other nearly fifteen. Pacing off a
+      percentage of your goal time gets both of them wrong.
+    </p>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">What the splits show</p>
+    <h2>Where the race is actually decided</h2>
+    <p>
+      Across 844 finishers, the fastest tenth of the field and the slowest are
+      64.8 minutes apart. That gap is not spread evenly.
+    </p>
+    <div class="statrow">
+      <div class="stat">
+        <div class="fig">15.1%</div>
+        <p class="cap">of the entire gap is the wall balls alone — 4:48 for
+        the fast group, 14:36 for the slow.</p>
+      </div>
+      <div class="stat">
+        <div class="fig">14.2%</div>
+        <p class="cap">is roxzone: pure transition time, needing no fitness
+        to improve, and almost never trained.</p>
+      </div>
+      <div class="stat">
+        <div class="fig">+52%</div>
+        <p class="cap">is how much slower the last run is than the first for
+        athletes over two hours. Under 70 minutes it is +1.6%.</p>
+      </div>
+      <div class="stat">
+        <div class="fig">2:16</div>
+        <p class="cap">of shape difference between men and women who
+        finished within the same ten minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">What you get</p>
+    <h2>Four sheets. One number to type.</h2>
+    <div class="contents">
+      <div class="row">
+        <span class="idx">01</span>
+        <span class="what">My race plan</span>
+        <span class="tag">You type here</span>
+        <span class="desc">Target time and division in. Seventeen splits and a running clock out.</span>
+      </div>
+      <div class="row">
+        <span class="idx">02</span>
+        <span class="what">Men vs women</span>
+        <span class="tag">Reference</span>
+        <span class="desc">The same race at the same finish time, segment by segment. The reason there are two plans and not one.</span>
+      </div>
+      <div class="row">
+        <span class="idx">03</span>
+        <span class="what">Where the race is won</span>
+        <span class="tag">Reference</span>
+        <span class="desc">Every segment's share of the gap between a fast race and a slow one, so you know what is worth training.</span>
+      </div>
+      <div class="row">
+        <span class="idx">04</span>
+        <span class="what">Method</span>
+        <span class="tag">Reference</span>
+        <span class="desc">How every number was derived, and what the data cannot support.</span>
+      </div>
+    </div>
+    <p class="note">
+      .xlsx · opens in Excel, Numbers, Google Sheets and LibreOffice · live
+      formulas, not a printout · no macros, works offline
+    </p>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Why you can trust the numbers</p>
+    <h2>The limits are printed inside the file</h2>
+    <p>
+      Every figure comes from the published per-athlete split tables at
+      results.hyrox.com. An athlete is used only if their sixteen splits plus
+      roxzone reconstruct their published finish time to within 2% — 36 of 880
+      failed that test and were dropped rather than quietly averaged in.
+    </p>
+    <div class="honest">
+      <p>
+        This edition is built from one race. Course layout, floor surface and
+        conditions all move splits a little, so treat the plan as a
+        well-founded starting point rather than a law. It is rebuilt as more
+        races are added, and buyers get every rebuild.
+      </p>
+      <p>
+        If you find a figure you think is wrong, send it over. Corrections get
+        published, not quietly patched.
+      </p>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Fit</p>
+    <h2>Worth it, and not worth it</h2>
+    <div class="forwho">
+      <div>
+        <p class="eyebrow">Buy it if</p>
+        <ul class="yes">
+          <li>You have a race booked and a time in mind</li>
+          <li>You have gone out too hard before and want a number to hold</li>
+          <li>You coach athletes through races and pace them by feel</li>
+          <li>You want to know which station is worth your winter</li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Skip it if</p>
+        <ul class="no">
+          <li>You want a training programme — this paces, it does not prescribe</li>
+          <li>You are racing doubles or relay; this is the individual race</li>
+          <li>You already have split data from your own races and a model for it</li>
+          <li>You will not open a spreadsheet</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Price</p>
+    <h2>Less than a pair of grips</h2>
+    <div class="price-block">
+      <p class="eyebrow">Splitline HYROX Pacing Plan</p>
+      <p class="amount"><span class="cur">$</span>19<span class="per">one payment · instant download</span></p>
+      <a class="buy" href="REPLACE_WITH_LEMONSQUEEZY_CHECKOUT_URL">Get the pacing plan</a>
+      <p class="terms">
+        One athlete, or one coaching staff. Share your plan freely; please do
+        not redistribute the file.<br>
+        Rebuilt as more races are added — you get every rebuild for this season.
+      </p>
+    </div>
+  </section>
+
+  <hr>
+
+  <section>
+    <p class="eyebrow">Questions</p>
+    <h2>Before you buy</h2>
+    <div class="faq">
+      <div class="q">
+        <h3>What do I need to enter?</h3>
+        <p>One number: your target finish time in minutes. And whether you are
+        racing the men's or women's division.</p>
+      </div>
+      <div class="q">
+        <h3>Why do men and women get different plans?</h3>
+        <p>Because at the same finish time they run measurably different races.
+        Women in this data are almost a minute faster on the sandbag lunges and
+        forty seconds slower on the ski erg. Pacing a woman off a man's plan
+        puts her behind exactly where she can least afford it.</p>
+      </div>
+      <div class="q">
+        <h3>Does it work in Google Sheets?</h3>
+        <p>Yes. The lookups deliberately avoid array formulas, so the plan
+        behaves identically in Excel, Numbers, Google Sheets and LibreOffice.
+        No macros, nothing to install.</p>
+      </div>
+      <div class="q">
+        <h3>Is this an elite plan or a first-timer plan?</h3>
+        <p>Both. Any whole target between 60 and 140 minutes. The race shape
+        changes across that range, which is the whole point.</p>
+      </div>
+      <div class="q">
+        <h3>Who makes this?</h3>
+        <p>Splitline — a newsletter that analyses hybrid fitness data and shows
+        its working. The same splits behind this plan are what the weekly
+        analysis runs on.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Splitline · splitline.beehiiv.com</span>
+    <span>Source: published HYROX race results</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+
+# Synthetic data must never be committed — it exists only for local testing.
+data/*.SYNTHETIC
+data/open_*.csv.gz
+
+# Built products NEVER go in the repo. This repo is public so the code can be
+# checked and so chart images have a free https home — but the paid workbook
+# and pacing plan are the thing being sold. A public dist/ gives them away.
+dist/
+*.xlsx
+
+# Local scratch
+/tmp/

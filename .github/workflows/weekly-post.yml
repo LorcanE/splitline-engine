@@ -1,0 +1,93 @@
+name: Weekly post
+
+# Sunday 21:00 UTC = Monday 07:00 in Melbourne (AEST). During AEDT this lands
+# at 08:00 — close enough that it is not worth two schedules.
+on:
+  schedule:
+    - cron: "0 21 * * 0"
+  workflow_dispatch:
+    inputs:
+      angle:
+        description: "Force a specific angle slug (blank = next in the bank)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Render but do not deliver"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: splitline-weekly
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run the pipeline
+        id: run
+        env:
+          CF_YEAR: ${{ vars.CF_YEAR || '2026' }}
+          CF_DIVISIONS: ${{ vars.CF_DIVISIONS || '1,2' }}
+          ASSET_BASE: ${{ vars.ASSET_BASE }}
+          SPLITLINE_PRODUCT_URL: ${{ vars.SPLITLINE_PRODUCT_URL }}
+          BEEHIIV_AUTOPOST: ${{ vars.BEEHIIV_AUTOPOST || 'false' }}
+          BEEHIIV_STATUS: ${{ vars.BEEHIIV_STATUS || 'draft' }}
+          BEEHIIV_PUB_ID: ${{ secrets.BEEHIIV_PUB_ID }}
+          BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+        run: |
+          set +e
+          python scripts/run_weekly.py \
+            ${{ github.event.inputs.angle && format('--angle {0}', github.event.inputs.angle) || '' }} \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          # 2 means "nothing cleared the editorial gate" — a quiet week, not a
+          # broken pipeline. Anything else is a real failure.
+          if [ $code -eq 2 ]; then exit 0; fi
+          exit $code
+
+      - name: Commit the post and its charts
+        if: steps.run.outputs.exit_code == '0'
+        run: |
+          git config user.name  "splitline-bot"
+          git config user.email "splitlinehq@gmail.com"
+          git add posts state data
+          if git diff --staged --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "post: $(date -u +%Y-%m-%d) weekly run"
+            git push
+          fi
+
+      - name: Upload the post as an artifact
+        if: steps.run.outputs.exit_code == '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: splitline-post-${{ github.run_number }}
+          path: posts/
+          retention-days: 90
+
+      - name: Flag a quiet week
+        if: steps.run.outputs.exit_code == '2'
+        run: |
+          echo "::warning::No angle cleared the publish gate this week. \
+          See the job summary for what each angle scored."
