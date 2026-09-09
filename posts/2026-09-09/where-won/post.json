@@ -1,0 +1,23 @@
+{
+  "slug": "where-won",
+  "title": "Wall Balls decide your HYROX",
+  "subtitle": "The fastest 10% and the slowest 10% of 844 finishers are 64:48 apart. Here is exactly where that time goes.",
+  "preview_text": "Every HYROX athlete has a theory about where their race is lost. The splits settle it. Across 844 finishers, the gap between the fastest tenth of the field and the slowest is\u2026",
+  "date": "2026-09-09",
+  "n": 844,
+  "effect": 0.151,
+  "stats": {
+    "gap_s": 3888.0,
+    "top_segment": "All eight runs",
+    "top_share": 0.42463991769547327,
+    "top_station": "Wall Balls",
+    "three_stations_share": 0.3117283950617284
+  },
+  "assets": [
+    "where_won.png"
+  ],
+  "asset_base": "https://raw.githubusercontent.com/LorcanE/splitline-engine/main/posts",
+  "asset_dir": "2026-09-09/where-won",
+  "dataset_note": "Method: computed from the published split tables of 844 finishers at 2026 HYROX Beijing. An athlete is included only if their sixteen splits plus roxzone reconstruct their published finish time to within 2%.",
+  "source": "the public HYROX race results at results.hyrox.com"
+}
