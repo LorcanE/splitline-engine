@@ -40,7 +40,8 @@ def create_post(meta: dict, post_dir: Path) -> dict:
     }
     if base := meta.get("asset_base"):
         if assets := meta.get("assets"):
-            payload["thumbnail_image_url"] = f"{base}/{meta['slug']}/{assets[0]}"
+            payload["thumbnail_image_url"] = (
+                f"{base}/{meta.get('asset_dir', meta['slug'])}/{assets[0]}")
 
     try:
         r = requests.post(

@@ -1,20 +1,17 @@
-name: Weekly post (CrossFit Open) — off season
+name: Weekly post (HYROX)
 
-# MANUAL ONLY until January.
+# The in-season post. HYROX races run most weekends from September, so this is
+# the one that fires all season. Sunday 21:00 UTC = Monday 07:00 Melbourne.
 #
-# The Open runs in February and March. Posting Open analysis in September means
-# emailing people about a competition that finished six months ago and does not
-# return for five more, so this workflow is deliberately off the schedule.
-# HYROX is in season and carries the weekly slot — see weekly-hyrox.yml.
-#
-# To bring it back in January, uncomment the schedule below:
-#   schedule:
-#     - cron: "0 21 * * 0"   # Sunday 21:00 UTC = Monday 07:00 Melbourne
+# It runs off the split data committed in data/, so it needs no crawl and
+# finishes in under a minute.
 on:
+  schedule:
+    - cron: "0 21 * * 0"
   workflow_dispatch:
     inputs:
       angle:
-        description: "Force a specific angle slug (blank = next in the bank)"
+        description: "Force an angle (sex-shape | where-won | run-fade). Blank = next in the bank."
         required: false
         default: ""
       dry_run:
@@ -26,13 +23,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: splitline-weekly
+  group: splitline-weekly-hyrox
   cancel-in-progress: false
 
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -43,17 +40,12 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      - name: Run the pipeline
+      - name: Write the post
         id: run
         env:
-          CF_YEAR: ${{ vars.CF_YEAR || '2026' }}
-          CF_DIVISIONS: ${{ vars.CF_DIVISIONS || '1,2' }}
           ASSET_BASE: ${{ vars.ASSET_BASE }}
           SPLITLINE_PRODUCT_URL: ${{ vars.SPLITLINE_PRODUCT_URL }}
-          BEEHIIV_AUTOPOST: ${{ vars.BEEHIIV_AUTOPOST || 'false' }}
-          BEEHIIV_STATUS: ${{ vars.BEEHIIV_STATUS || 'draft' }}
-          BEEHIIV_PUB_ID: ${{ secrets.BEEHIIV_PUB_ID }}
-          BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
+          HYROX_RACE: ${{ vars.HYROX_RACE || '2026 HYROX Beijing' }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
@@ -61,13 +53,15 @@ jobs:
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
         run: |
           set +e
-          python scripts/run_weekly.py \
+          python scripts/run_hyrox.py \
+            --men data/hyrox_beijing_men_raw.txt \
+            --women data/hyrox_beijing_women_raw.txt \
+            --race "$HYROX_RACE" \
             ${{ github.event.inputs.angle && format('--angle {0}', github.event.inputs.angle) || '' }} \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          # 2 means "nothing cleared the editorial gate" — a quiet week, not a
-          # broken pipeline. Anything else is a real failure.
+          # 2 means nothing cleared the editorial gate — a quiet week, not a fault.
           if [ $code -eq 2 ]; then exit 0; fi
           exit $code
 
@@ -76,24 +70,22 @@ jobs:
         run: |
           git config user.name  "splitline-bot"
           git config user.email "splitline-bot@users.noreply.github.com"
-          git add posts state data
+          git add posts state
           if git diff --staged --quiet; then
             echo "nothing to commit"
           else
-            git commit -m "post: $(date -u +%Y-%m-%d) weekly run"
+            git commit -m "post: $(date -u +%Y-%m-%d) HYROX weekly"
             git push
           fi
 
-      - name: Upload the post as an artifact
+      - name: Upload the post
         if: steps.run.outputs.exit_code == '0'
         uses: actions/upload-artifact@v4
         with:
-          name: splitline-post-${{ github.run_number }}
+          name: splitline-hyrox-post-${{ github.run_number }}
           path: posts/
           retention-days: 90
 
       - name: Flag a quiet week
         if: steps.run.outputs.exit_code == '2'
-        run: |
-          echo "::warning::No angle cleared the publish gate this week. \
-          See the job summary for what each angle scored."
+        run: echo "::warning::No HYROX angle cleared the publish gate this week."

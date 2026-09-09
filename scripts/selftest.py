@@ -91,6 +91,25 @@ def main() -> int:
         check("nan" not in html.lower().replace("finance", ""), "no NaN leaked into copy")
         check(meta["n"] > 0 and meta["title"], "post metadata is populated")
         check((tmp / "render" / "preview.html").exists(), "preview page written")
+
+        # The chart URL in the email must point at where the workflow actually
+        # commits the file. Locally the image is on disk either way, so a wrong
+        # URL is invisible until subscribers see broken images.
+        from splitline import config as _cfg
+        real_dir = _cfg.POSTS / "2099-01-01" / "age-curve"
+        real_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            f2 = angles.run_angle("age-curve", df, real_dir)
+            m2 = render_post.render(f2, real_dir,
+                                    source="the public CrossFit Games Open leaderboard")
+            html2 = (real_dir / "email.html").read_text()
+            for asset in m2["assets"]:
+                want = f"posts/2099-01-01/age-curve/{asset}"
+                check(want in html2 or f"/{asset}" in html2 and not render_post.ASSET_BASE,
+                      f"chart URL matches the committed path ({asset})")
+                check((real_dir / asset).exists(), f"chart file exists ({asset})")
+        finally:
+            shutil.rmtree(_cfg.POSTS / "2099-01-01", ignore_errors=True)
         # A HYROX post must never cite the CrossFit leaderboard, and vice
         # versa. Getting this wrong is invisible in testing and fatal to trust.
         alt = render_post.render(f, tmp / "src", source="the HYROX results")

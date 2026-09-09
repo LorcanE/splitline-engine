@@ -17,7 +17,7 @@ from datetime import date
 from pathlib import Path
 
 from ..analysis.finding import Block, Finding
-from ..config import BRAND, PRODUCT_URL, SITE, env
+from ..config import BRAND, POSTS, PRODUCT_URL, SITE, env
 from ..style import CSS
 
 ASSET_BASE = env("ASSET_BASE", "").rstrip("/")
@@ -32,16 +32,24 @@ def _esc(s: str) -> str:
     return out
 
 
-def _asset_url(local_path: str, slug: str) -> str:
+def _asset_url(local_path: str, rel_dir: str) -> str:
+    """Public URL for a chart image.
+
+    `rel_dir` is the post's directory relative to posts/ — e.g.
+    "2026-09-09/sex-shape". It must match exactly where the workflow commits
+    the file, date folder included: a URL missing that folder returns 404 and
+    every chart in the email renders as a broken image, which is invisible
+    when testing locally because the file is right there on disk.
+    """
     name = Path(local_path).name
     if not ASSET_BASE:
         # No host configured — leave a clearly broken relative path rather than
         # a silently wrong absolute one, so a dry run makes the gap obvious.
         return f"./{name}"
-    return f"{ASSET_BASE}/{slug}/{name}"
+    return f"{ASSET_BASE}/{rel_dir}/{name}"
 
 
-def _block_html(b: Block, slug: str) -> str:
+def _block_html(b: Block, rel_dir: str) -> str:
     if b.kind == "lede":
         return f'<p style="{CSS["lede"]}">{_esc(b.text)}</p>'
     if b.kind == "p":
@@ -55,7 +63,7 @@ def _block_html(b: Block, slug: str) -> str:
     if b.kind == "callout":
         return f'<div style="{CSS["callout"]}">{_esc(b.text)}</div>'
     if b.kind == "chart":
-        url = _asset_url(b.src, slug)
+        url = _asset_url(b.src, rel_dir)
         cap = (f'<p style="{CSS["figcap"]}">{_esc(b.caption)}</p>'
                if b.caption else "")
         return (f'<img src="{html.escape(url, quote=True)}" '
@@ -115,7 +123,12 @@ def _footer(slug: str, dataset_note: str = "",
 def render(f: Finding, out_dir: Path, dataset_note: str = "",
            source: str = DEFAULT_SOURCE) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
-    body = "".join(_block_html(b, f.slug) for b in f.blocks)
+    # The URL must mirror the committed path exactly, date folder included.
+    try:
+        rel_dir = out_dir.resolve().relative_to(POSTS.resolve()).as_posix()
+    except ValueError:
+        rel_dir = out_dir.name
+    body = "".join(_block_html(b, rel_dir) for b in f.blocks)
     body += _footer(f.slug, dataset_note, source)
 
     email_html = (
@@ -137,6 +150,7 @@ def render(f: Finding, out_dir: Path, dataset_note: str = "",
         "stats": f.stats,
         "assets": [Path(b.src).name for b in f.blocks if b.kind == "chart"],
         "asset_base": ASSET_BASE,
+        "asset_dir": rel_dir,
         "dataset_note": dataset_note,
         "source": source,
     }
