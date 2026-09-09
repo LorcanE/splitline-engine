@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from splitline import config, store  # noqa: E402
 from splitline.analysis import angles  # noqa: E402
 from splitline.deliver import deliver_all  # noqa: E402
+from splitline.render import charts  # noqa: E402
 from splitline.render import post as render_post  # noqa: E402
 
 logging.basicConfig(
@@ -118,6 +119,8 @@ def main() -> int:
     else:
         angles.set_population(0, 0)
     summary["sampled"] = bool(sample)
+    charts.set_source("CrossFit Games public Open leaderboard")
+
     work = config.POSTS / f"{date.today():%Y-%m-%d}"
     work.mkdir(parents=True, exist_ok=True)
 

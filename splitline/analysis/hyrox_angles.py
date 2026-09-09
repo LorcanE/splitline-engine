@@ -34,6 +34,21 @@ def angle(slug: str):
     return deco
 
 
+# Short labels for charts. The full names belong in tables, where there is
+# room; on a 350px-wide chart they crowd out the plot itself.
+SHORT = {
+    "1000m SkiErg": "SkiErg", "50m Sled Push": "Sled push",
+    "50m Sled Pull": "Sled pull", "80m Burpee Broad Jump": "Burpees",
+    "1000m Row": "Row", "200m Farmers Carry": "Farmers carry",
+    "100m Sandbag Lunges": "Lunges", "Wall Balls": "Wall balls",
+    "Roxzone": "Roxzone", "All eight runs": "Runs (all 8)",
+}
+
+
+def _short(name: str) -> str:
+    return SHORT.get(name, name)
+
+
 def _ms(seconds: float) -> str:
     s = int(round(seconds))
     return f"{s // 60}:{s % 60:02d}"
@@ -78,7 +93,7 @@ def sex_shape(df: pd.DataFrame, out: Path) -> Finding:
     effect = span / (95 * 60 - 85 * 60)
 
     chart = charts.barh(
-        [r[0] for r in rows][::-1], [r[2] - r[1] for r in rows][::-1],
+        [_short(r[0]) for r in rows][::-1], [r[2] - r[1] for r in rows][::-1],
         "Women minus men, at the same finish time",
         "seconds (negative = women faster)",
         out / "sex_shape.png", value_fmt="{:+.0f}s",
@@ -166,7 +181,7 @@ def where_won(df: pd.DataFrame, out: Path) -> Finding:
                                      reverse=True)[:3])
 
     chart = charts.barh(
-        [r[0] for r in rows][::-1], [r[4] * 100 for r in rows][::-1],
+        [_short(r[0]) for r in rows][::-1], [r[4] * 100 for r in rows][::-1],
         "Share of the fast-to-slow gap, by segment",
         "% of the total gap", out / "where_won.png",
         highlight=len(rows) - 1, value_fmt="{:.1f}%",

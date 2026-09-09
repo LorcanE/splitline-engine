@@ -54,7 +54,12 @@ def apply_theme() -> None:
             "axes.facecolor": PAPER,
             "savefig.facecolor": PAPER,
             "savefig.bbox": "tight",
-            "savefig.dpi": 200,
+            # Charts are read on a phone. An email column is ~350px wide on
+            # mobile, so a 1800px chart is downscaled ~5x and 9pt axis text
+            # lands at roughly 2pt on screen — unreadable. Render smaller and
+            # set type much larger, so the downscale is ~3x and labels stay
+            # legible at the size people actually see them.
+            "savefig.dpi": 170,
             "figure.dpi": 110,
             "axes.edgecolor": RULE,
             "axes.linewidth": 1.0,
@@ -65,21 +70,21 @@ def apply_theme() -> None:
             "axes.spines.top": False,
             "axes.spines.right": False,
             "axes.labelcolor": MUTED,
-            "axes.labelsize": 10,
-            "axes.titlesize": 13,
+            "axes.labelsize": 14,
+            "axes.titlesize": 17,
             "axes.titleweight": "bold",
             "axes.titlecolor": INK,
             "axes.titlelocation": "left",
             "axes.titlepad": 12,
             "xtick.color": MUTED,
             "ytick.color": MUTED,
-            "xtick.labelsize": 9,
-            "ytick.labelsize": 9,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
             "xtick.direction": "out",
             "ytick.direction": "out",
             "legend.frameon": False,
-            "legend.fontsize": 9,
-            "lines.linewidth": 2.2,
+            "legend.fontsize": 13,
+            "lines.linewidth": 2.8,
             "lines.solid_capstyle": "round",
         }
     )

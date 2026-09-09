@@ -18,6 +18,7 @@ from splitline import config, store  # noqa: E402
 from splitline.analysis import hyrox_angles as ha  # noqa: E402
 from splitline.deliver import deliver_all  # noqa: E402
 from splitline.product import pacing  # noqa: E402
+from splitline.render import charts  # noqa: E402
 from splitline.render import post as render_post  # noqa: E402
 
 logging.basicConfig(level=logging.INFO,
@@ -59,6 +60,8 @@ def main() -> int:
             f"finishers at {args.race}. An athlete is included only if their "
             f"sixteen splits plus roxzone reconstruct their published finish "
             f"time to within 2%.")
+
+    charts.set_source(f"HYROX race results, {args.race}")
 
     work = config.POSTS / f"{date.today():%Y-%m-%d}"
     used = set(store.used_angles())
