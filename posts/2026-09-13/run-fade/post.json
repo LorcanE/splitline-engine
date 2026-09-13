@@ -1,0 +1,22 @@
+{
+  "slug": "run-fade",
+  "title": "The slowest athletes do not run slower \u2014 they collapse",
+  "subtitle": "Run 1 against run 8 for 844 finishers, grouped by finish time.",
+  "preview_text": "A HYROX is eight one-kilometre runs with a station between each. The interesting number is not how fast the first one is \u2014 it is how much slower the last one is than the first.",
+  "date": "2026-09-13",
+  "n": 844,
+  "effect": 0.5075,
+  "stats": {
+    "fastest_band": "<70",
+    "fastest_fade": 0.01632653061224487,
+    "slowest_band": "120+",
+    "slowest_fade": 0.5238095238095237
+  },
+  "assets": [
+    "run_fade.png"
+  ],
+  "asset_base": "https://raw.githubusercontent.com/LorcanE/splitline-engine/main/posts",
+  "asset_dir": "2026-09-13/run-fade",
+  "dataset_note": "Method: computed from the published split tables of 844 finishers at 2026 HYROX Beijing. An athlete is included only if their sixteen splits plus roxzone reconstruct their published finish time to within 2%.",
+  "source": "the public HYROX race results at results.hyrox.com"
+}
